@@ -3,9 +3,38 @@ import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
+const URL = process.env.STRAPI_BASE_URL;
 
-export default function Home() {
+export async function getStaticProps(context) {
+  const fetchParams = {
+    method: 'Post',
+    headers: {
+      'content-type': "application/json"
+    },
+    body: JSON.stringify({
+      query: `{
+      books{
+        data{
+          attributes{
+            Name
+          }
+        }
+      }
+    }`
+    })
+  }
+
+  const res = await fetch(`${URL}/graphql`,fetchParams);
+  const data = await res.json();
+
+  return {
+    props: data,
+  }
+}
+
+export default function Home({data}) {
+  console.log({data});
   return (
     <>
       <Head>
@@ -17,7 +46,7 @@ export default function Home() {
       <main className={styles.main}>
         <div className={styles.description}>
           <p>
-            Get started by editing&nbsp;
+            Moiz, Get started by editing&nbsp;
             <code className={styles.code}>pages/index.js</code>
           </p>
           <div>
